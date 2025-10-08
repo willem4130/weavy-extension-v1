@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite build --watch --mode development",
     "build": "tsc && vite build && npm run postbuild",
-    "postbuild": "test -f dist/src/popup/popup.html && mv dist/src/popup/popup.html dist/popup.html && rm -rf dist/src && sed -i.bak 's|../../assets/|assets/|g' dist/popup.html && rm -f dist/popup.html.bak || true",
+    "postbuild": "test -f dist/src/sidepanel/sidepanel.html && mv dist/src/sidepanel/sidepanel.html dist/sidepanel.html && rm -rf dist/src && sed -i.bak 's|../../assets/|assets/|g' dist/sidepanel.html && rm -f dist/sidepanel.html.bak || true",
     "preview": "vite preview"
   },
   "keywords": ["chrome-extension", "weavy", "workflow", "templates"],

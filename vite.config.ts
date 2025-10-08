@@ -24,7 +24,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        popup: path.resolve(__dirname, 'src/popup/popup.html'),
+        sidepanel: path.resolve(__dirname, 'src/sidepanel/sidepanel.html'),
         'service-worker': path.resolve(__dirname, 'src/service-worker.ts'),
         'content-script': path.resolve(__dirname, 'src/content-script.ts')
       },
@@ -39,9 +39,9 @@ export default defineConfig({
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           const name = assetInfo.name || '';
-          // popup.html at root level
-          if (name === 'popup.html') {
-            return 'popup.html';
+          // sidepanel.html at root level
+          if (name === 'sidepanel.html') {
+            return 'sidepanel.html';
           }
           // CSS files at root assets
           if (name.endsWith('.css')) {

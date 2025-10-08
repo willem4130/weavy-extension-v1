@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Weavy Template Manager",
-  "version": "1.0.0",
-  "description": "Save and manage Weavy.ai workflow templates with clipboard-based workflow",
+  "version": "2.0.0",
+  "description": "Save and manage Weavy.ai workflow templates with persistent side panel and unlimited storage",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -10,18 +10,27 @@
   },
   "permissions": [
     "storage",
-    "clipboardWrite"
+    "clipboardWrite",
+    "sidePanel",
+    "unlimitedStorage"
   ],
   "background": {
     "service_worker": "service-worker.js",
     "type": "module"
   },
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+    "default_title": "Open Weavy Templates"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+W",
+        "mac": "Command+Shift+W"
+      },
+      "description": "Toggle Weavy side panel"
     }
   }
 }

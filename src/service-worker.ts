@@ -35,13 +35,30 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       await chrome.storage.local.set({
         settings: {
           userId: crypto.randomUUID(),
-          version: '1.0.0',
+          version: '2.0.0',
           theme: 'dark'
         }
+      });
+
+      // Open side panel on first install
+      await chrome.sidePanel.setOptions({
+        enabled: true
       });
     } catch (error) {
       console.error('Failed to initialize extension:', error);
     }
+  }
+});
+
+// Handle action clicks to open side panel - MUST be in global scope
+chrome.action.onClicked.addListener(async (tab) => {
+  try {
+    // Open the side panel for the current tab
+    if (tab.id) {
+      await chrome.sidePanel.open({ tabId: tab.id });
+    }
+  } catch (error) {
+    console.error('Failed to open side panel:', error);
   }
 });
 
