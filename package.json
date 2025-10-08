@@ -1,0 +1,28 @@
+{
+  "name": "weavy-template-manager",
+  "version": "1.0.0",
+  "description": "Chrome extension for managing Weavy.ai workflow templates",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc && vite build && npm run postbuild",
+    "postbuild": "test -f dist/src/popup/popup.html && mv dist/src/popup/popup.html dist/popup.html && rm -rf dist/src && sed -i.bak 's|../../assets/|assets/|g' dist/popup.html && rm -f dist/popup.html.bak || true",
+    "preview": "vite preview"
+  },
+  "keywords": ["chrome-extension", "weavy", "workflow", "templates"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.1.22",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vite-plugin-static-copy": "^3.1.3"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
