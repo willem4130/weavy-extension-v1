@@ -1,9 +1,15 @@
 /**
  * TemplateCard Component
  * Displays individual template with actions
+ * Now includes size monitoring and visual indicators
  */
 
 import { Template } from '../../shared/types';
+import {
+  getTemplateSize,
+  formatBytes,
+  getTemplateSizeCategory
+} from '../../shared/storage-utils';
 
 interface TemplateCardProps {
   template: Template;
@@ -31,6 +37,11 @@ function formatDate(timestamp: number): string {
 }
 
 export default function TemplateCard({ template, onEdit, onDelete, onCopy }: TemplateCardProps) {
+  // Calculate template size and get visual indicator
+  const templateSize = getTemplateSize(template);
+  const sizeInfo = getTemplateSizeCategory(templateSize);
+  const sizeFormatted = formatBytes(templateSize);
+
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't trigger if clicking on buttons
     if ((e.target as HTMLElement).closest('button')) {
@@ -99,6 +110,17 @@ export default function TemplateCard({ template, onEdit, onDelete, onCopy }: Tem
         <div className="template-meta">
           <span className="badge">{template.data.nodes.length} nodes</span>
           <span className="badge">{template.data.edges.length} edges</span>
+          <span
+            className="badge"
+            style={{
+              backgroundColor: `${sizeInfo.color}22`,
+              color: sizeInfo.color,
+              borderColor: sizeInfo.color
+            }}
+            title={`Template size: ${sizeFormatted} (${sizeInfo.category})`}
+          >
+            {sizeInfo.icon} {sizeFormatted}
+          </span>
           <span className="text-muted text-xs">{formatDate(template.createdAt)}</span>
         </div>
 
