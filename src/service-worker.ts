@@ -229,8 +229,9 @@ async function handleUpdateTemplate(message: UpdateTemplateMessage) {
 }
 
 /**
- * Copy template JSON to clipboard
- * Chrome 139+ supports navigator.clipboard in service workers
+ * Get template JSON data for clipboard copy
+ * Returns data to popup/sidepanel which handles clipboard write
+ * (Service workers cannot access navigator.clipboard)
  */
 async function handleCopyTemplate(message: CopyTemplateMessage) {
   try {
@@ -240,14 +241,17 @@ async function handleCopyTemplate(message: CopyTemplateMessage) {
       throw new Error('Template not found');
     }
 
-    // Copy template data (nodes + edges) to clipboard
+    // Return template data (nodes + edges) as JSON string
+    // Popup/sidepanel will write to clipboard
     const jsonString = JSON.stringify(template.data, null, 2);
-    await navigator.clipboard.writeText(jsonString);
 
     return {
       type: MessageType.TEMPLATE_COPIED,
       timestamp: Date.now(),
-      payload: { success: true }
+      payload: {
+        success: true,
+        data: jsonString
+      }
     };
   } catch (error) {
     throw new Error(`Failed to copy template: ${error instanceof Error ? error.message : 'Unknown error'}`);

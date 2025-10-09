@@ -132,13 +132,19 @@ function App() {
 
   const handleCopy = async (id: string) => {
     try {
-      await chrome.runtime.sendMessage({
+      const response = await chrome.runtime.sendMessage({
         type: MessageType.COPY_TEMPLATE,
         timestamp: Date.now(),
         payload: { templateId: id }
       });
 
-      showToast('Copied to clipboard!', 'success');
+      // Write to clipboard (service worker returns the data)
+      if (response.payload?.data) {
+        await navigator.clipboard.writeText(response.payload.data);
+        showToast('Copied to clipboard!', 'success');
+      } else {
+        throw new Error('No data received from service worker');
+      }
     } catch (err) {
       showToast('Failed to copy template', 'error');
     }
