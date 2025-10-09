@@ -308,6 +308,7 @@ function App() {
         {(view === 'create' || view === 'edit') && (
           <TemplateForm
             template={editingTemplate || undefined}
+            availableTags={availableTags}
             onSave={handleSave}
             onCancel={handleCancel}
           />

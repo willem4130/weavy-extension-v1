@@ -83,19 +83,24 @@ export default function TemplateCard({ template, onEdit, onDelete, onCopy }: Tem
         <div className="card-actions">
           <button
             onClick={handleEdit}
-            className="btn-icon btn-ghost"
+            className="btn-icon-card btn-edit"
             title="Edit template"
             aria-label="Edit template"
           >
-            ✏️
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M12.854 1.854a.5.5 0 0 0-.708 0L10.5 3.5 12.5 5.5l1.646-1.646a.5.5 0 0 0 0-.708l-1.292-1.292zM10 4l-8 8V14h2l8-8L10 4z"/>
+            </svg>
           </button>
           <button
             onClick={handleDelete}
-            className="btn-icon btn-ghost btn-danger"
+            className="btn-icon-card btn-delete"
             title="Delete template"
             aria-label="Delete template"
           >
-            🗑️
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+              <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+            </svg>
           </button>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { Template, Node, Edge } from '../../shared/types';
 
 interface TemplateFormProps {
   template?: Template;
+  availableTags?: string[];
   onSave: (data: TemplateFormData) => Promise<void>;
   onCancel: () => void;
 }
@@ -19,7 +20,7 @@ export interface TemplateFormData {
   data: { nodes: Node[]; edges: Edge[] };
 }
 
-export default function TemplateForm({ template, onSave, onCancel }: TemplateFormProps) {
+export default function TemplateForm({ template, availableTags = [], onSave, onCancel }: TemplateFormProps) {
   const isEditMode = !!template;
 
   const [name, setName] = useState(template?.name || '');
@@ -29,11 +30,46 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
   );
   const [tags, setTags] = useState<string[]>(template?.tags || []);
   const [tagInput, setTagInput] = useState('');
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [tagInputFocused, setTagInputFocused] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [preview, setPreview] = useState<{ nodes: number; edges: number } | null>(
     template ? { nodes: template.data.nodes.length, edges: template.data.edges.length } : null
   );
   const [saving, setSaving] = useState(false);
+
+  // Filter tag suggestions based on input or show all when focused
+  useEffect(() => {
+    // When focused with no input, show all available tags
+    if (tagInputFocused && !tagInput.trim()) {
+      const available = availableTags
+        .filter((tag) => !tags.includes(tag))
+        .slice(0, 10); // Show more tags when browsing
+      setTagSuggestions(available);
+      setShowSuggestions(available.length > 0);
+      return;
+    }
+
+    // When typing, filter tags
+    if (tagInput.trim()) {
+      const input = tagInput.toLowerCase();
+      const filtered = availableTags
+        .filter((tag) =>
+          tag.toLowerCase().includes(input) &&
+          !tags.includes(tag)
+        )
+        .slice(0, 5); // Limit to 5 when filtering
+
+      setTagSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+      return;
+    }
+
+    // When not focused and no input, hide suggestions
+    setTagSuggestions([]);
+    setShowSuggestions(false);
+  }, [tagInput, tags, availableTags, tagInputFocused]);
 
   // Validate JSON on change
   useEffect(() => {
@@ -75,11 +111,10 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
       newErrors.name = 'Name must be at least 3 characters';
     }
 
-    if (!isEditMode && !jsonInput.trim()) {
+    // JSON is now always required (both create and edit modes)
+    if (!jsonInput.trim()) {
       newErrors.json = 'JSON data is required';
-    }
-
-    if (jsonInput.trim()) {
+    } else {
       try {
         const data = JSON.parse(jsonInput);
         if (!data.nodes || !Array.isArray(data.nodes)) {
@@ -124,11 +159,12 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
     }
   };
 
-  const handleAddTag = () => {
-    const tag = tagInput.trim().toLowerCase();
+  const handleAddTag = (tagToAdd?: string) => {
+    const tag = (tagToAdd || tagInput).trim().toLowerCase();
     if (tag && !tags.includes(tag) && tags.length < 10) {
       setTags([...tags, tag]);
       setTagInput('');
+      setShowSuggestions(false);
     }
   };
 
@@ -140,7 +176,13 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
     if (e.key === 'Enter') {
       e.preventDefault();
       handleAddTag();
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
     }
+  };
+
+  const handleSelectSuggestion = (tag: string) => {
+    handleAddTag(tag);
   };
 
   return (
@@ -158,7 +200,7 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
         {/* JSON Input */}
         <div className="form-group">
           <label htmlFor="json-input" className="form-label">
-            Template Data (JSON) {!isEditMode && <span className="text-danger">*</span>}
+            Template Data (JSON) <span className="text-danger">*</span>
           </label>
           <textarea
             id="json-input"
@@ -167,13 +209,17 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
             onChange={(e) => setJsonInput(e.target.value)}
             placeholder='{"nodes": [...], "edges": [...]}'
             rows={8}
-            disabled={isEditMode}
             style={{ fontFamily: 'monospace', fontSize: 'var(--font-size-sm)' }}
           />
           {errors.json && <p className="form-error">{errors.json}</p>}
           {preview && (
             <p className="form-hint text-success">
               ✓ Valid JSON: {preview.nodes} nodes, {preview.edges} edges
+            </p>
+          )}
+          {isEditMode && (
+            <p className="form-hint">
+              You can edit or replace the template code. Changes will be saved when you click Update Template.
             </p>
           )}
         </div>
@@ -188,7 +234,16 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
             type="text"
             className={`input ${errors.name ? 'input-error' : ''}`}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              const newName = e.target.value;
+              setName(newName);
+              // Live validation - clear error immediately when valid
+              if (newName.trim().length >= 3) {
+                setErrors((prev) => ({ ...prev, name: '' }));
+              } else if (newName.trim().length > 0) {
+                setErrors((prev) => ({ ...prev, name: 'Name must be at least 3 characters' }));
+              }
+            }}
             placeholder="e.g., RAG Pipeline Template"
             maxLength={100}
           />
@@ -212,7 +267,7 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
         </div>
 
         {/* Tags Input */}
-        <div className="form-group">
+        <div className="form-group" style={{ position: 'relative' }}>
           <label htmlFor="tag-input" className="form-label">
             Tags (Optional)
           </label>
@@ -224,19 +279,47 @@ export default function TemplateForm({ template, onSave, onCancel }: TemplateFor
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleTagInputKeyDown}
-              placeholder="Add tag (press Enter)"
+              onFocus={() => setTagInputFocused(true)}
+              onBlur={() => {
+                // Delay to allow clicking on suggestions
+                setTimeout(() => setTagInputFocused(false), 200);
+              }}
+              placeholder="Type to search or browse all tags"
               maxLength={20}
               disabled={tags.length >= 10}
             />
             <button
               type="button"
               className="btn btn-secondary btn-sm"
-              onClick={handleAddTag}
+              onClick={() => handleAddTag()}
               disabled={!tagInput.trim() || tags.length >= 10}
             >
               Add
             </button>
           </div>
+
+          {/* Tag Suggestions Dropdown */}
+          {showSuggestions && tagSuggestions.length > 0 && (
+            <div className="tag-suggestions">
+              <div className="tag-suggestions-header">
+                <span className="text-xs text-muted">
+                  {tagInput.trim() ? 'Matching tags' : 'All available tags'}
+                </span>
+              </div>
+              {tagSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  className="tag-suggestion-item"
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                >
+                  <span className="tag tag-accent tag-sm">{suggestion}</span>
+                  <span className="text-xs text-muted">Click to add</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           {tags.length > 0 && (
             <div className="tags" style={{ marginTop: 'var(--spacing-2)' }}>
               {tags.map((tag) => (

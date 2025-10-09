@@ -378,6 +378,70 @@
   color: var(--text-muted);
 }
 
+/* ===== Tag Suggestions Dropdown ===== */
+.tag-suggestions {
+  position: absolute;
+  top: calc(100% + var(--spacing-1));
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 200px;
+  overflow-y: auto;
+  animation: slideDown var(--transition-fast);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tag-suggestions-header {
+  padding: var(--spacing-2) var(--spacing-3);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.tag-suggestion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.tag-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.tag-suggestion-item:hover {
+  background: var(--bg-hover);
+}
+
+.tag-suggestion-item:active {
+  background: var(--bg-active);
+}
+
+.tag-sm {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-2);
+}
+
 /* ===== Tabs ===== */
 .tabs {
   display: flex;
@@ -677,7 +741,52 @@
 
 .template-card .card-actions {
   display: flex;
-  gap: var(--spacing-2);
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+/* Better button styling for template cards */
+.btn-icon-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: var(--spacing-2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-icon-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.btn-icon-card:active {
+  transform: translateY(0);
+}
+
+.btn-icon-card svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-edit:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.btn-delete:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 .template-description {
